@@ -1,0 +1,10 @@
+; $Id: biblio_record.info,v 1.0 $
+name = Biblio Record
+description = Create biblio_record content type.
+package = Drupac
+core = 7.x
+php = 5.2
+files[] = biblio_record.module
+dependencies[] = field
+dependencies[] = number
+dependencies[] = text
