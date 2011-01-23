@@ -92,6 +92,7 @@ function biblio_record_install() {
     		'locked' => FALSE, 
     		'cardinality' => 1, 
     		'translatable' => TRUE, 
+			'settings' => array('max_length' => 5000),
 		),
 		array(
     		'field_name' => 'biblio_record_subjects', 
