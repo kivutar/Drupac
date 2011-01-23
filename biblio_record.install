@@ -1,0 +1,248 @@
+<?php
+
+function biblio_record_install() {
+	$fields = array(
+		array(
+    		'field_name' => 'biblio_record_isbn', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+
+		),
+		array(
+    		'field_name' => 'biblio_record_author', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_language', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_format', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_pub', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_year_pub', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_series', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_edition', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_description', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_add_details', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
+    		'field_name' => 'biblio_record_subjects', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => FIELD_CARDINALITY_UNLIMITED, 
+    		'translatable' => TRUE, 
+		),
+	);
+
+	$fields_instances = array(
+		array(
+			'field_name' => 'biblio_record_isbn',
+    		'entity_type' => 'node',
+    		'label' => t('ISBN'),
+    		'bundle' => 'biblio_record',
+    		'description' => 'Enter an isbn.',
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 20),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_author',
+    		'entity_type' => 'node',
+    		'label' => t('Author'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter an author name'),
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 30),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_language',
+    		'entity_type' => 'node',
+    		'label' => t('Language'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter the language.'),
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 20),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_format',
+    		'entity_type' => 'node',
+    		'label' => t('Format'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter the format.'),
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 20),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_pub',
+    		'entity_type' => 'node',
+    		'label' => t('Published'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter publishing informations.'),
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 60),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_year_pub',
+    		'entity_type' => 'node',
+    		'label' => t('Year Published'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter publishing year.'),
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 10),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_series',
+    		'entity_type' => 'node',
+    		'label' => t('Series'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter series.'),
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 60),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_edition',
+    		'entity_type' => 'node',
+    		'label' => t('Edition'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter edition.'),
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 60),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_description',
+    		'entity_type' => 'node',
+    		'label' => t('Description'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter a description.'),
+    		'widget' => array(
+      			'type' => 'text_textarea',
+				'settings' => array('rows' => 3),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_add_details',
+    		'entity_type' => 'node',
+    		'label' => t('Additional Details'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter some additional details.'),
+    		'widget' => array(
+      			'type' => 'text_textarea',
+				'settings' => array('rows' => 10),
+    		),
+		),
+		array(
+			'field_name' => 'biblio_record_subjects',
+    		'entity_type' => 'node',
+    		'label' => t('Subjects'),
+    		'bundle' => 'biblio_record',
+    		'description' => t('Enter a subjects.'),
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 60),
+    		),
+		),
+	);
+
+	foreach ( $fields as $field ) {
+		field_create_field($field);
+	}
+
+	foreach ( $fields_instances as $instance) {
+		field_create_instance($instance);
+	}
+}
+
+function biblio_record_uninstall() {
+	$fields = array('biblio_record_isbn', 'biblio_record_author', 'biblio_record_language', 'biblio_record_format',
+		'biblio_record_pub', 'biblio_record_year_pub', 'biblio_record_series', 'biblio_record_edition',
+		'biblio_record_description', 'biblio_record_add_details', 'biblio_record_subjects');
+	foreach ($fields as $field) {
+		field_delete_instance($field);
+		field_delete_field($field);
+	}
+}
