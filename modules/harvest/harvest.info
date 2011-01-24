@@ -1,0 +1,12 @@
+; $Id: harvest.info,v 1.0 $
+name = Harvest
+description = Batch creation of biblio_record nodes using a SIGB connector.
+package = Drupac
+core = 7.x
+php = 5.2
+
+files[] = harvest.module
+
+dependencies[] = biblio_record
+dependencies[] = sigb_connector
+

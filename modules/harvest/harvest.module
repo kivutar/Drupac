@@ -1,0 +1,20 @@
+<?php
+
+function harvest_import_record($id) {
+    $record = sigb_connector_scrape_bib($id);
+    
+    $node = new stdClass();
+    $node->type = 'biblio_record';
+    $node->title = $record['title'];
+    
+    $node = node_submit($node);
+    node_save($node);
+    return $node->nid;
+}
+
+function harvest_import_records($offset, $number) {
+    for ( $i = $offset; $i < $offset+$number; $i++ ) {
+        harvest_import_record($i);
+    }
+}
+
