@@ -13,6 +13,11 @@ function harvest_drush_command() {
         ),
         'aliases'     => array('hir'),
     );
+    $items['harvest-purge-records'] = array(
+        'callback'    => 'harvest_drush_purge_records',
+        'description' => dt('Delete all the biblio_records from the database.'),
+        'aliases'     => array('hpr'),
+    );
 
     return $items;
 }
@@ -28,6 +33,18 @@ function harvest_drush_import_records() {
     $args = func_get_args();
     if (count($args) == 2) {
         print harvest_import_records($args[0], $args[1]);
+    }
+}
+
+function harvest_drush_purge_records() {
+    $nids = db_select('node', 'n')
+        ->fields('n', array('nid'))
+        ->condition('type', 'biblio_record')
+        ->execute()
+        ->fetchCol();
+
+    foreach ($nids as $nid) {
+        node_delete($nid);
     }
 }
 
