@@ -1,0 +1,342 @@
+<?php
+
+function ilsdi_connector_menu() {
+    $items = array();
+    $items['ilsdi_connector/settings'] = array(
+        'title' => 'ILSDI connector settings',
+        'description' =>  'ILSDI connector settings',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('ilsdi_connector_admin_settings'),
+        'file' => 'ilsdi_connector.admin.inc',
+        'access arguments' => array('administer site configuration'),
+    );
+    $items['admin/config/drupac/ilsdi_connector'] = array(
+        'title' => 'ILSDI connector settings',
+        'description' =>  'ILSDI connector settings',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('ilsdi_connector_admin_settings'),
+        'file' => 'ilsdi_connector.admin.inc',
+        'access arguments' => array('administer site configuration'),
+    );
+    return $items;
+}
+
+function ilsdi_connector_scrape_bib($bnum) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+    
+    $url = $server.'?service=GetRecords&id=' . $bnum;
+    $xml = @simplexml_load_file($url);
+    $xml2 = @simplexml_load_string($xml->record->marcxml);
+    $bib_info_marc = _parse_marc_subfields($xml2);
+    
+    // Title information
+    $bib['title'] = '';
+    $title = _prepare_marc_values($bib_info_marc['200'], array('a'));
+    $bib['title'] = $title[0];
+    if (!$bib['title']) {
+        $bib['title'] = ' ';
+    }
+    
+    // Notes
+    $bib['notes'] = '';
+    $bib['notes'] = _prepare_marc_values($bib_info_marc['300'], array('a'));
+    
+    unset($bib_info_marc);
+    return $bib;
+}
+
+function ilsdi_connector_item_status($bnum) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+    
+    $url = $server.'?service=GetRecords&id=' . $bnum;
+    $xml = @simplexml_load_file($url);
+    
+    $is['holds']  = (int) count($xml->record->reserves->reserve);
+    $is['order']  = (int) $xml->record->order;
+    $is['avail'] = (int) count($xml->record->items->item) - count($xml->record->issues->issue);
+    $is['total']  = (int) count($xml->record->items->item);
+
+    $is['items'] = array();
+    if ($xml->record->items->item) {
+        foreach($xml->record->items->item as $item) {
+            $itemnumber = (int) $item->itemnumber;
+            $is['items'][$itemnumber]['callnum'] = (string) $item->itemcallnumber;
+            $is['items'][$itemnumber]['loc_code'] = (string) $item->homebranch;
+            $is['items'][$itemnumber]['location'] = (string) $item->location;
+            $is['items'][$itemnumber]['branch'] = (string) $item->holdingbranch;
+            $is['items'][$itemnumber]['age'] = (string) $item->ccode;
+            $is['items'][$itemnumber]['avail']++;
+            foreach($xml->record->issues->issue as $issue) {
+                if ((int) $item->itemnumber == (int) $issue->itemnumber) {
+                    $is['items'][$itemnumber]['avail']--;
+                }
+            }
+        }
+    }
+    
+    return $is;
+}
+
+function ilsdi_connector_patron_info($cardnum) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+
+    $patron_id = _patron_id($cardnum);
+    if ( ! $patron_id) { return FALSE; }
+
+    $url = $server.'?service=GetPatronInfo&patron_id=' . $patron_id;
+    $xml = @simplexml_load_file($url);
+
+    $pi['pnum']      = (string) $xml->borrowernumber;
+    $pi['cardnum']   = (int)    $xml->cardnumber;
+    $pi['checkouts'] = (int)    count(ilsdi_connector_patron_checkouts($cardnum, NULL));
+    $pi['homelib']   = (string) $xml->branchname;
+    $pi['balance']   = (float)  $xml->charges;
+    $pi['expires']   = (string) _date_to_timestamp($xml->dateexpiry);
+    $pi['name']      = (string) $xml->firstname . " " . $xml->surname;
+    $pi['address']   = (string) $xml->address;
+    $pi['tel1']      = (string) $xml->phone;
+    if     ($xml->mobile)   { $pi['tel2'] = (string) $xml->mobile; }
+    elseif ($xml->phonepro) { $pi['tel2'] = (string) $xml->phonepro; }
+    $pi['email']     = (string) $xml->email;
+
+    return $pi;
+}
+
+function ilsdi_connector_patron_checkouts($cardnum, $pin = NULL) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+    
+    $patron_id = _patron_id($cardnum);
+    if ( ! $patron_id) { return FALSE; }
+    
+    $url = $server.'?service=GetPatronInfo&patron_id=' . $patron_id . '&show_loans=1';
+    $xml = @simplexml_load_file($url);
+
+    $i = 0;
+    foreach($xml->loans->loan as $loan) {
+        $pc[$i][varname]   = (int)    $loan->itemnumber;
+        $pc[$i][inum]      = (int)    $loan->itemnumber;
+        $pc[$i][bnum]      = (int)    $loan->biblionumber;
+        $pc[$i][title]     = (string) $loan->title;
+        $pc[$i][ill]       = 0;
+        $pc[$i][numrenews] = (int)    $loan->renewals;
+        $pc[$i][duedate]   = (string) _date_to_timestamp($loan->date_due);
+        $pc[$i][callnum]   = (string) $loan->itemcallnumber;
+        $i++;
+    }
+    
+    return $pc;
+}
+
+function ilsdi_connector_patron_holds($cardnum, $pin = NULL) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+    
+    $patron_id = _patron_id($cardnum);
+    if ( ! $patron_id) { return FALSE; }
+    
+    $url = $server.'?service=GetPatronInfo&patron_id=' . $patron_id . '&show_holds=1';
+    $xml = @simplexml_load_file($url);
+
+    $i = 0;
+    foreach($xml->holds->hold as $hold) {        
+        $ph[$i][varname]    = (int)    $hold->itemnumber;
+        $ph[$i][inum]       = (int)    $hold->itemnumber;
+        $ph[$i][bnum]       = (int)    $hold->biblionumber;
+        $ph[$i][title]      = (string) $hold->title;
+        $ph[$i][ill]        = 0;
+        if     ($hold->found == 'W') { $ph[$i][status] = "Waiting";              } // the reserve has an itemnumber affected, and is on the way
+        elseif ($hold->found == 'F') { $ph[$i][status] = "Finished";             } // the reserve has been completed, and is done
+        else                         { $ph[$i][status] = "Waiting to be pulled"; } // means the patron requested the 1st available, and we haven't choosen the item
+        $ph[$i][pickuploc]  = (string) $hold->branchname;
+        $ph[$i][canceldate] = (string) $hold->cancellationdate;
+        $i++;
+    }
+    return $ph;
+}
+
+function ilsdi_connector_renew_items($cardnum, $pin = NULL, $items = NULL) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+    
+    $patron_id = _patron_id($cardnum);
+    if ( ! $patron_id) { return FALSE; }
+    
+    $itemnumbers = array();
+    if ($items == 'all') {
+        $checkouts = ilsdi_connector_patron_checkouts($cardnum, $pin);
+        foreach($checkouts as $checkout) {
+            array_push($itemnumbers, $checkout['inum']);
+        }
+    }
+    elseif (is_array($items)) {
+        $itemnumbers = $items;
+    }
+    else {
+        array_push($itemnumbers, $items);
+    }
+    
+    foreach($itemnumbers as $itemnumber) {
+        $url = $server.'?service=RenewLoan&patron_id=' . $patron_id . '&item_id=' . $itemnumber;
+        $xml = @simplexml_load_file($url);
+    
+        $ri[$itemnumber][varname]     = $itemnumber;
+        $ri[$itemnumber][num_renews]  = (int) $xml->renewals;
+        $ri[$itemnumber][new_duedate] = (string) _date_to_timestamp($xml-date_due);
+        if ($xml->error) { $ri[$itemnumber][error] = (string) $xml->error; }
+    }
+
+    return $ri;
+}
+
+function ilsdi_connector_cancel_holds($cardnum, $pin = NULL, $items = NULL) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+    
+    $patron_id = _patron_id($cardnum);
+    if ( ! $patron_id) { return FALSE; }
+    
+    $itemnumbers = array();
+    if (is_array($items)) {
+        $itemnumbers = $items;
+    }
+    else {
+        array_push($itemnumbers, $items);
+    }
+    
+    foreach($itemnumbers as $itemnumber) {
+        $url = $server.'?service=CancelHold&patron_id=' . $patron_id . '&item_id=' . $itemnumber;
+        $xml = @simplexml_load_file($url);
+        
+        if($xml->message != 'Canceled') { return FALSE; }
+    }
+
+    return TRUE;
+}
+
+function ilsdi_connector_place_hold($cardnum, $bnum, $inum = NULL, $pin = NULL, $pickup_loc = NULL) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+
+    if ($inum) {
+        $patron_id = _patron_id($cardnum);
+        if ( ! $patron_id) { return FALSE; }
+    
+        $url = $server.'?service=HoldItem&patron_id=' . $patron_id . '&bib_id=' . $bnum . '&item_id=' . $inum;
+        if ($pickup_loc) { $url .= '&pickup_location=' . $pickup_loc; }
+        $xml = @simplexml_load_file($url);
+        
+        if ( $xml->pickup_location ) {
+            $ph[success] = 1;
+        }
+        #$ph[success] = ($xml->message == 'Success');
+        $ph[error]   = (string) $xml->message;
+    } else {
+        $url = $server.'?service=GetRecords&id=' . $bnum;
+        $xml = @simplexml_load_file($url);
+    
+        if ($xml->record->items->item) {
+            foreach($xml->record->items->item as $item) {
+                $inum = (int) $item->itemnumber;
+                $ph[selection][$inum][status]   = "-"; // FIXME needs GetAvailability
+                $ph[selection][$inum][varname]  = $inum;
+                $ph[selection][$inum][location] = (string) $item->holdingbranchname;
+                $ph[selection][$inum][callnum]  = (string) $item->itemcallnumber;
+            }
+        }
+    }
+
+    return $ph;
+}
+
+function ilsdi_connector_patron_fines($cardnum, $pin = NULL) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+        
+    $patron_id = _patron_id($cardnum);
+    if ( ! $patron_id) { return FALSE; }
+    
+    $url = $server.'?service=GetPatronInfo&patron_id=' . $patron_id . '&show_fines=1';
+    $xml = @simplexml_load_file($url);
+
+    foreach($xml->fines->fine as $fine) {
+        $accountno = (int) $fine->{'accountno'};
+        $fines[$accountno][varname] = 'fine'.$accountno;
+        $fines[$accountno][desc]    = (string) $fine->{'description'};
+        $fines[$accountno][amount]  = (float)  $fine->{'amount'};
+    }
+    
+    return $fines;
+}
+
+function ilsdi_connector_pay_patron_fines($cardnum, $pin = NULL, $payment_details) {
+    return false;
+}
+
+function _patron_id($cardnum) {
+    $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+
+    $url = $server.'?service=LookupPatron&id=' . $cardnum . '&id_type=cardnumber';
+    $xml = @simplexml_load_file($url);
+
+    return $xml->id;
+}
+
+function _prepare_marc_values($value_arr, $subfields, $delimiter = ' ') {
+
+    // Repeatable values can be returned as an array or a serialized value
+    foreach ($subfields as $subfield) {
+        $pad = array();
+        $i = array();
+        if (is_array($value_arr[$subfield])) {
+
+            foreach ($value_arr[$subfield] as $subkey => $subvalue) {
+
+                if (is_array($subvalue)) {
+                    foreach ($subvalue as $sub_subvalue) {
+                        if ($i[$subkey]) { $pad[$subkey] = $delimiter; }
+                        $sv_tmp = preg_replace('/\{(.*?)\}/', '', trim($sub_subvalue));
+                        $sv_tmp = trim(preg_replace('/</i', '"', $sv_tmp));
+                        if (trim($sub_subvalue)) { $marc_values[$subkey] .= $pad[$subkey] . $sv_tmp; }
+                        $i[$subkey] = 1;
+                    }
+                } else {
+                    if ($i[$subkey]) { $pad[$subkey] = $delimiter; }
+                    
+                    // This is a workaround until I can figure out wtf III is doing with encoding.  For now
+                    // there will be no extended characters:
+                    $sv_tmp = preg_replace('/\{(.*?)\}/', '', trim($subvalue));
+
+                    // Fix odd quote issues.  May be a club method of doing this, but oh well.
+                    $sv_tmp = trim(preg_replace('/</i', '"', $sv_tmp));
+
+                    if (trim($subvalue)) { $marc_values[$subkey] .= $pad[$subkey] . $sv_tmp; }
+                    $i[$subkey] = 1;
+                }
+            }    
+        }        
+    }
+
+    if (is_array($marc_values)) {
+        foreach ($marc_values as $mv) {
+            $result[] = $mv;
+        }
+    }
+    return $result;
+}
+
+function _parse_marc_subfields($marcxml) {
+    $bim_item = 0;
+    foreach ($marcxml->datafield as $datafield) {
+        $marc_num = (string) $datafield->attributes()->tag;
+        foreach ($datafield->subfield as $subfield) {
+            $code = trim((string) $subfield->attributes()->code);
+            $data = trim((string) $subfield);
+            $marc_sub[$marc_num][$code][$bim_item] = $data;
+        }
+        $bim_item++;
+    }
+    return $marc_sub;
+}
+
+function _date_to_timestamp($date) {
+    $reg = "/([0-9].*)-([0-9].*)-([0-9].*)/";
+    preg_match_all($reg, $date, $matches);
+    $time = mktime(0, 0, 0, $matches[2][0], $matches[3][0], $matches[1][0]);
+    return $time;
+}
+

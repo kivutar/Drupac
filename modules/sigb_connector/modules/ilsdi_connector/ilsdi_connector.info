@@ -1,0 +1,11 @@
+; $Id: ilsdi_connector.info,v 1.0 $
+name = ILSDI Connector
+description = Connects Drupac to an ILSDI
+package = Drupac
+core = 7.x
+php = 5.2
+configure = admin/config/drupac/ilsdi_connector
+
+files[] = ilsdi_connector.module
+
+dependencies[] = sigb_connector

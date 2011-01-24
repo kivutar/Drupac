@@ -1,0 +1,56 @@
+<?php
+
+function openlibrary_connector_scrape_bib($id) {
+    $content = file_get_contents("http://openlibrary.org/books/OL${id}M.json");
+    $olrecord = json_decode($content);
+
+    if ( $olrecord->type->key == '/type/edition' ) {
+        $drecord = array();
+
+        $drecord['title'] = $olrecord->title;
+
+        if ( property_exists($olrecord, 'publishers') ) {
+            $drecord['publishers'] = $olrecord->publishers;
+        }
+
+        return $drecord;
+    }
+    return false;
+}
+
+function openlibrary_connector_item_status($id) {
+    return false;
+}
+
+function openlibrary_connector_patron_info($cardnum) {
+    return false;
+}
+
+function openlibrary_connector_patron_checkouts($cardnum, $pin = NULL) {
+    return false;
+}
+
+function openlibrary_connector_patron_holds($cardnum, $pin = NULL) {
+    return false;
+}
+
+function openlibrary_connector_renew_items($cardnum, $pin = NULL, $items = NULL) {
+    return false;
+}
+
+function openlibrary_connector_cancel_holds($cardnum, $pin = NULL, $items = NULL) {
+    return false;
+}
+
+function openlibrary_connector_place_hold($cardnum, $bnum, $inum = NULL, $pin = NULL, $pickup_loc = NULL) {
+    return false;
+}
+
+function openlibrary_connector_patron_fines($cardnum, $pin = NULL) {
+    return false;
+}
+
+function openlibrary_connector_pay_patron_fines($cardnum, $pin = NULL, $payment_details) {
+    return false;
+}
+

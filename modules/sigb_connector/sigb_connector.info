@@ -1,0 +1,9 @@
+; $Id: sigb_connector.info,v 1.0 $
+name = SIGB Connector
+description = Allow Drupac to interract with a SIGB through a specific connector.
+package = Drupac
+core = 7.x
+php = 5.2
+configure = admin/config/drupac/sigb_connector
+
+files[] = sigb_connector.module

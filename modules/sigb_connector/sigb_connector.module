@@ -1,0 +1,83 @@
+<?php
+
+function sigb_connector_menu() {
+    $items = array();
+    $items['sigb_connector/settings'] = array(
+        'title' => 'SIGB connector settings',
+        'description' =>  'SIGB connector settings',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('sigb_connector_admin_settings'),
+        'file' => 'sigb_connector.admin.inc',
+        'access arguments' => array('administer site configuration'),
+    );
+    $items['admin/config/drupac/sigb_connector'] = array(
+        'title' => 'SIGB connector settings',
+        'description' =>  'SIGB connector settings',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('sigb_connector_admin_settings'),
+        'file' => 'sigb_connector.admin.inc',
+        'access arguments' => array('administer site configuration'),
+    );
+    return $items;
+}
+
+function sigb_connector_scrape_bib($id) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_scrape_bib';
+    return $func($id);
+}
+
+function sigb_connector_item_status($id) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_item_status';
+    return $func($id);
+}
+
+function sigb_connector_patron_info($cardnum) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_patron_info';
+    return $func($cardnum);
+}
+
+function sigb_connector_patron_checkouts($cardnum, $pin = NULL) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_patron_checkouts';
+    return $func($cardnum, $pin);
+}
+
+function sigb_connector_patron_holds($cardnum, $pin = NULL) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_patron_holds';
+    return $func($cardnum, $pin);
+}
+
+function sigb_connector_renew_items($cardnum, $pin = NULL, $items = NULL) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_renew_items';
+    return $func($cardnum, $pin, $items);
+}
+
+function sigb_connector_cancel_holds($cardnum, $pin = NULL, $items = NULL) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_cancel_holds';
+    return $func($cardnum, $pin, $items);
+}
+
+function sigb_connector_place_hold($cardnum, $bnum, $inum = NULL, $pin = NULL, $pickup_loc = NULL) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_place_holds';
+    return $func($cardnum, $bnum, $inum, $pin, $pickup_loc);
+}
+
+function sigb_connector_patron_fines($cardnum, $pin = NULL) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_patron_fines';
+    return $func($cardnum, $pin);
+}
+
+function sigb_connector_pay_patron_fines($cardnum, $pin = NULL, $payment_details) {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_pay_patron_fines';
+    return $func($cardnum, $pin, $payment_details);
+}
+

@@ -1,0 +1,10 @@
+; $Id: openlibrary_connector.info,v 1.0 $
+name = OpenLibrary Connector
+description = Connects Drupac to OpenLibrary
+package = Drupac
+core = 7.x 
+php = 5.2 
+
+files[] = openlibrary_connector.module
+
+dependencies[] = sigb_connector
