@@ -1,0 +1,25 @@
+<?php
+
+function biblio_display_theme() {
+    $theme = 'simple';
+    return array(
+        'biblio-record' => array(
+            'render element' => 'elements',
+            'template' => 'themes/' . $theme . '/node--biblio-record',
+            'preprocess functions' => array (
+                0 => 'template_preprocess',
+                1 => 'template_preprocess_node',
+                3 => 'contextual_preprocess',
+                4 => 'rdf_preprocess_node',
+            ),
+        ),
+    );
+}
+
+function biblio_display_node_view_alter(&$build) {
+#	debug($build);
+    if ($build['#bundle'] == 'biblio_record') {
+        //Change theme.
+        $build['#theme'] = 'biblio-record';
+    }
+}

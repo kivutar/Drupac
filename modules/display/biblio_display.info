@@ -1,0 +1,9 @@
+; $Id: biblio_display.info,v 1.0 $
+name = Display
+description = Manages biblio record displaying.
+package = Drupac
+core = 7.x
+
+files[] = biblio_display.module
+
+dependencies[] = biblio_record
