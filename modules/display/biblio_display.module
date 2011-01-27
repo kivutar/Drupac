@@ -1,25 +1,57 @@
 <?php
 
 function biblio_display_theme() {
-    $theme = 'simple';
-    return array(
-        'biblio-record' => array(
-            'render element' => 'elements',
-            'template' => 'themes/' . $theme . '/node--biblio-record',
-            'preprocess functions' => array (
-                0 => 'template_preprocess',
-                1 => 'template_preprocess_node',
-                3 => 'contextual_preprocess',
-                4 => 'rdf_preprocess_node',
-            ),
-        ),
-    );
+	$theme = 'simple';
+	return array(
+		'biblio-record' => array(
+			'render element' => 'elements',
+			'template' => 'themes/' . $theme . '/node--biblio-record',
+			'preprocess functions' => array (
+				0 => 'template_preprocess',
+				1 => 'template_preprocess_node',
+				2 => 'template_preprocess_biblio_record',
+				3 => 'contextual_preprocess',
+				4 => 'rdf_preprocess_node',
+			),
+		),
+	);
 }
 
 function biblio_display_node_view_alter(&$build) {
-#	debug($build);
-    if ($build['#bundle'] == 'biblio_record') {
-        //Change theme.
-        $build['#theme'] = 'biblio-record';
-    }
+	#debug($build);
+	$options = array(
+		'file' => 'sites/all/modules/Drupac/module/display/themes/simple/biblio.css',
+	);
+	drupal_add_css(NULL, $options);
+	if ($build['#bundle'] == 'biblio_record') {
+		//Change theme.
+		$build['#theme'] = 'biblio-record';
+	}
 }
+
+function template_preprocess_biblio_record(&$variables) {
+	$config = array(
+		'biblio_record_author' => 'left',
+		'biblio_record_isbn' => 'left',
+		'biblio_record_language' => 'left',
+		'biblio_record_format' => 'left',
+		'biblio_record_pub' => 'left',
+		'biblio_record_year_pub' => 'left',
+		'biblio_record_series' => 'left',
+		'biblio_record_edition' => 'left',
+		'biblio_record_description' => 'right',
+		'biblio_record_add_details' => 'right',
+		'biblio_record_subjects' => 'left',
+	);
+	
+	foreach ($config as $key => $zone) {
+		$variables[ $zone ][ $key ] = $variables['content'][ $key ];
+	}
+}
+
+function biblio_display_init() {
+  // Since this file should only be loaded on the front page, it cannot be
+  // declared in the info file.
+    drupal_add_css(drupal_get_path('module', 'biblio_display') . '/themes/simple/biblio.css');
+}
+

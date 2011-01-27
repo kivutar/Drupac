@@ -9,19 +9,17 @@
   <?php endif; ?>
   <?php print render($title_suffix); ?>
 
-  <?php if ($display_submitted): ?>
-    <div class="submitted">
-        <span>display/themes/simple/node--biblio-record.tpl.php</span>
-    </div>
-  <?php endif; ?>
-
   <div class="content"<?php print $content_attributes; ?>>
+		<div class="contentleft">
     <?php
-      // We hide the comments and links now so that we can render them later.
-      hide($content['comments']);
-      hide($content['links']);
-      print render($content);
+			print render($left);
     ?>
+		</div>
+		<div class="contentright">
+			<?php
+				print render($right);
+			?>
+		</div>
   </div>
 
   <?php print render($content['links']); ?>
