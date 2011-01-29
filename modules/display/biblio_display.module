@@ -14,11 +14,13 @@ function biblio_display_theme() {
 				4 => 'rdf_preprocess_node',
 			),
 		),
+		'bibliofield' => array(
+			'render element' => 'elements',
+		),
 	);
 }
 
 function biblio_display_node_view_alter(&$build) {
-	#debug($build);
 	$options = array(
 		'file' => 'sites/all/modules/Drupac/module/display/themes/simple/biblio.css',
 	);
@@ -29,9 +31,61 @@ function biblio_display_node_view_alter(&$build) {
 	}
 }
 
+function biblio_display_field_attach_view_alter(&$output, $context) {
+#  var_dump($output);
+	$output['biblio_record_author']['#theme'] = 'bibliofield';
+#  print_r($output['biblio_record_author']);
+}
+
+function theme_bibliofield($variables) {
+#Array ( 
+#[elements] => Array ( 
+#	[#theme] => bibliofield [#weight] => 1 
+#	[#title] => Author 
+#	[#access] => 1 
+#	[#label_display] => above 
+#	[#view_mode] => full 
+#	[#language] => und 
+#	[#field_name] => biblio_record_author 
+#	[#field_type] => text 
+#	[#field_translatable] => 1 
+#	[#entity_type] => node 
+#	[#bundle] => biblio_record 
+#	[#items] => Array ( 
+#		[0] => Array ( 
+#			[value] => Camilla Lackberg 
+#			[format] => 
+#			[safe_value] => Camilla Lackberg 
+#		) 
+#	) 
+#	[#formatter] => text_default 
+#	[0] => Array ( 
+#		[#markup] => Camilla Lackberg 
+#	) 
+  $output = '<h1>By ' . $variables['elements']['#items']['0']['safe_value'] . '</h1>';
+
+#  // Render the label, if it's not hidden.
+#  if (!$variables['label_hidden']) {
+#    $output .= '<div class="field-labels"' . $variables['title_attributes'] . '>' . $variables['label'] . ':&nbsp;</div>';
+#  }
+
+#  // Render the items.
+#  $output .= '<div class="field-items"' . $variables['content_attributes'] . '>';
+#  foreach ($variables['items'] as $delta => $item) {
+#    $classes = 'field-item ' . ($delta % 2 ? 'odd' : 'even');
+#    $output .= '<div class="' . $classes . '"' . $variables['item_attributes'][$delta] . '>' . drupal_render($item) . '</div>';
+#  }
+#  $output .= '</div>';
+
+#  // Render the top-level DIV.
+#  $output = '<div class="' . $variables['classes'] . '"' . $variables['attributes'] . '>' . $output . '</div>';
+
+  return $output;
+}
+
 function template_preprocess_biblio_record(&$variables) {
 	$config = array(
-		'biblio_record_author' => 'left',
+		'biblio_record_author' => 'header',
 		'biblio_record_isbn' => 'left',
 		'biblio_record_language' => 'left',
 		'biblio_record_format' => 'left',
@@ -43,10 +97,12 @@ function template_preprocess_biblio_record(&$variables) {
 		'biblio_record_add_details' => 'right',
 		'biblio_record_subjects' => 'left',
 	);
-	
 	foreach ($config as $key => $zone) {
-		$variables[ $zone ][ $key ] = $variables['content'][ $key ];
+		if ( isset($variables['content'][$key]) && $zone != 'none') {
+			$variables[$zone][$key] = $variables['content'][$key];
+		}
 	}
+
 }
 
 function biblio_display_init() {

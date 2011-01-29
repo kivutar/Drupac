@@ -10,6 +10,11 @@
   <?php print render($title_suffix); ?>
 
   <div class="content"<?php print $content_attributes; ?>>
+		<div class="contentheader">
+			<?php
+				print render($header);
+			?>
+		</div>
 		<div class="contentleft">
     <?php
 			print render($left);
@@ -21,9 +26,9 @@
 			?>
 		</div>
   </div>
-
+	<div>
   <?php print render($content['links']); ?>
 
   <?php print render($content['comments']); ?>
-
+	</div>
 </div>
