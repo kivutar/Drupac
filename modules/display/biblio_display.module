@@ -3,16 +3,9 @@
 function biblio_display_theme() {
 	$theme = 'simple';
 	return array(
-		'biblio-record' => array(
+		'bibliorecord' => array(
 			'render element' => 'elements',
 			'template' => 'themes/' . $theme . '/node--biblio-record',
-			'preprocess functions' => array (
-				0 => 'template_preprocess',
-				1 => 'template_preprocess_node',
-				2 => 'template_preprocess_biblio_record',
-				3 => 'contextual_preprocess',
-				4 => 'rdf_preprocess_node',
-			),
 		),
 		'bibliofield' => array(
 			'render element' => 'elements',
@@ -21,26 +14,44 @@ function biblio_display_theme() {
 }
 
 function biblio_display_node_view_alter(&$build) {
-	$options = array(
-		'file' => 'sites/all/modules/Drupac/module/display/themes/simple/biblio.css',
-	);
-	drupal_add_css(NULL, $options);
 	if ($build['#bundle'] == 'biblio_record') {
-		//Change theme.
-		$build['#theme'] = 'biblio-record';
+		$build['#theme'] = 'bibliorecord';
 	}
 }
 
-function biblio_display_field_attach_view_alter(&$output, $context) {
-#  var_dump($output);
-	$output['biblio_record_author']['#theme'] = 'bibliofield';
-#  print_r($output['biblio_record_author']);
+function biblio_display_preprocess_bibliorecord(&$variables) {
+	template_preprocess_node($variables);
+	$config = array(
+		'biblio_record_author' => 'header',
+		'biblio_record_isbn' => 'left',
+		'biblio_record_language' => 'left',
+		'biblio_record_format' => 'left',
+		'biblio_record_pub' => 'left',
+		'biblio_record_year_pub' => 'left',
+		'biblio_record_series' => 'left',
+		'biblio_record_edition' => 'left',
+		'biblio_record_add_details' => 'right',
+		'biblio_record_description' => 'right',
+		'biblio_record_subjects' => 'left',
+	);
+	foreach ($config as $key => $zone) {
+		if ( isset($variables['content'][$key]) && $zone != 'none') {
+			$variables[$zone][$key] = $variables['content'][$key];
+		}
+	}
+}
+
+function biblio_record_field_attach_view_alter(&$output, $context) {
+	if ( array_key_exists('biblio_record_author', $output) ) {
+		$output['biblio_record_author']['#theme'] = 'bibliofield';
+	}
 }
 
 function theme_bibliofield($variables) {
 #Array ( 
 #[elements] => Array ( 
-#	[#theme] => bibliofield [#weight] => 1 
+#	[#theme] => bibliofield 
+#	[#weight] => 1 
 #	[#title] => Author 
 #	[#access] => 1 
 #	[#label_display] => above 
@@ -83,31 +94,7 @@ function theme_bibliofield($variables) {
   return $output;
 }
 
-function template_preprocess_biblio_record(&$variables) {
-	$config = array(
-		'biblio_record_author' => 'header',
-		'biblio_record_isbn' => 'left',
-		'biblio_record_language' => 'left',
-		'biblio_record_format' => 'left',
-		'biblio_record_pub' => 'left',
-		'biblio_record_year_pub' => 'left',
-		'biblio_record_series' => 'left',
-		'biblio_record_edition' => 'left',
-		'biblio_record_description' => 'right',
-		'biblio_record_add_details' => 'right',
-		'biblio_record_subjects' => 'left',
-	);
-	foreach ($config as $key => $zone) {
-		if ( isset($variables['content'][$key]) && $zone != 'none') {
-			$variables[$zone][$key] = $variables['content'][$key];
-		}
-	}
-
-}
-
 function biblio_display_init() {
-  // Since this file should only be loaded on the front page, it cannot be
-  // declared in the info file.
     drupal_add_css(drupal_get_path('module', 'biblio_display') . '/themes/simple/biblio.css');
 }
 
