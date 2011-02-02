@@ -1,0 +1,16 @@
+name = simple
+regions[header] = Header
+regions[left] = Left
+regions[right] = Right
+
+field[biblio_record_author] = header
+field[biblio_record_isbn] = left
+field[biblio_record_language] = left
+field[biblio_record_format] = left
+field[biblio_record_pub] = left
+field[biblio_record_year_pub] = left
+field[biblio_record_series] = left
+field[biblio_record_edition] = left
+field[biblio_record_add_details] = right
+field[biblio_record_description] = right
+field[biblio_record_subjects] = left

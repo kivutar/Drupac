@@ -9,9 +9,10 @@
   <?php endif; ?>
   <?php print render($title_suffix); ?>
 
-  <div class="content"<?php print $content_attributes; ?>>
+  <div class="content clearfix"<?php print $content_attributes; ?>>
 		<div class="contentheader">
 			<?php
+				print $title;
 				print render($header);
 			?>
 		</div>

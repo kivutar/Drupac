@@ -1,4 +1,7 @@
 <?php
+$themedata = biblio_display_get_theme_config();
+$theme_name = $themedata['name'];
+module_load_include('inc', 'biblio_display', 'themes/' . $theme_name . '/theme');
 
 function biblio_display_theme() {
 	$theme = 'simple';
@@ -6,9 +9,6 @@ function biblio_display_theme() {
 		'bibliorecord' => array(
 			'render element' => 'elements',
 			'template' => 'themes/' . $theme . '/node--biblio-record',
-		),
-		'bibliofield' => array(
-			'render element' => 'elements',
 		),
 	);
 }
@@ -21,33 +21,23 @@ function biblio_display_node_view_alter(&$build) {
 
 function biblio_display_preprocess_bibliorecord(&$variables) {
 	template_preprocess_node($variables);
-	$config = array(
-		'biblio_record_author' => 'header',
-		'biblio_record_isbn' => 'left',
-		'biblio_record_language' => 'left',
-		'biblio_record_format' => 'left',
-		'biblio_record_pub' => 'left',
-		'biblio_record_year_pub' => 'left',
-		'biblio_record_series' => 'left',
-		'biblio_record_edition' => 'left',
-		'biblio_record_add_details' => 'right',
-		'biblio_record_description' => 'right',
-		'biblio_record_subjects' => 'left',
-	);
-	foreach ($config as $key => $zone) {
-		if ( isset($variables['content'][$key]) && $zone != 'none') {
-			$variables[$zone][$key] = $variables['content'][$key];
+	$title = $variables['title'];
+	$themedata = biblio_display_get_theme_config();
+
+	foreach ($themedata['field'] as $fieldname => $region) {
+		if ( isset($variables['content'][$fieldname]) ) {
+			$variables[$region][$fieldname] = $variables['content'][$fieldname];
 		}
 	}
 }
 
 function biblio_record_field_attach_view_alter(&$output, $context) {
 	if ( array_key_exists('biblio_record_author', $output) ) {
-		$output['biblio_record_author']['#theme'] = 'bibliofield';
+		$output['biblio_record_author']['#theme'] = 'authorfield';
 	}
 }
 
-function theme_bibliofield($variables) {
+function theme_authorfield($variables) {
 #Array ( 
 #[elements] => Array ( 
 #	[#theme] => bibliofield 
@@ -75,26 +65,16 @@ function theme_bibliofield($variables) {
 #	) 
   $output = '<h1>By ' . $variables['elements']['#items']['0']['safe_value'] . '</h1>';
 
-#  // Render the label, if it's not hidden.
-#  if (!$variables['label_hidden']) {
-#    $output .= '<div class="field-labels"' . $variables['title_attributes'] . '>' . $variables['label'] . ':&nbsp;</div>';
-#  }
-
-#  // Render the items.
-#  $output .= '<div class="field-items"' . $variables['content_attributes'] . '>';
-#  foreach ($variables['items'] as $delta => $item) {
-#    $classes = 'field-item ' . ($delta % 2 ? 'odd' : 'even');
-#    $output .= '<div class="' . $classes . '"' . $variables['item_attributes'][$delta] . '>' . drupal_render($item) . '</div>';
-#  }
-#  $output .= '</div>';
-
-#  // Render the top-level DIV.
-#  $output = '<div class="' . $variables['classes'] . '"' . $variables['attributes'] . '>' . $output . '</div>';
-
   return $output;
 }
 
 function biblio_display_init() {
     drupal_add_css(drupal_get_path('module', 'biblio_display') . '/themes/simple/biblio.css');
+}
+
+function biblio_display_get_theme_config() {
+	$themename = 'simple';
+	$filename = drupal_get_path('module', 'biblio_display') . '/themes/simple/simple.info';
+	return drupal_parse_info_file($filename);
 }
 
