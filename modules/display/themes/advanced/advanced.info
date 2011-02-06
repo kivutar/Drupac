@@ -1,4 +1,4 @@
-name = Simple
+name = Advanced Theme
 regions[header] = Header
 regions[left] = Left
 regions[right] = Right

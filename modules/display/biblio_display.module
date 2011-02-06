@@ -1,7 +1,31 @@
 <?php
-$themedata = biblio_display_get_theme_config();
-$theme_name = $themedata['name'];
-module_load_include('inc', 'biblio_display', 'themes/' . $theme_name . '/theme');
+#$themedata = biblio_display_get_theme_config();
+#$theme_name = $themedata['name'];
+#module_load_include('inc', 'biblio_display', 'themes/' . $theme_name . '/theme');
+
+function biblio_display_menu() {
+    $items = array();
+    $items['admin/config/drupac/display'] = array(
+        'title' => 'Drupac displaying settings',
+        'description' =>  'Set up displaying of druapc record',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('biblio_display_admin_settings'),
+        'file' => 'biblio_display.admin.inc',
+        'access arguments' => array('administer site configuration'),
+		'type' => MENU_NORMAL_ITEM,
+    );
+	$items['display/theme'] = array(
+		'title' => 'theme settings',
+		'description' =>  'Set up displaying of druapc record',
+		'page callback' => 'drupal_get_form',
+        'page arguments' => array('biblio_display_theme_settings'),
+        'file' => 'biblio_display.admin.inc',
+        'access arguments' => array('administer site configuration'),
+#    	'type' => MENU_CALLBACK,
+
+	);
+    return $items;
+}
 
 function biblio_display_theme() {
 	$theme = 'simple';
@@ -72,9 +96,8 @@ function biblio_display_init() {
     drupal_add_css(drupal_get_path('module', 'biblio_display') . '/themes/simple/biblio.css');
 }
 
-function biblio_display_get_theme_config() {
-	$themename = 'simple';
-	$filename = drupal_get_path('module', 'biblio_display') . '/themes/simple/simple.info';
+function biblio_display_get_theme_config($theme_name = 'simple') {
+	$filename = drupal_get_path('module', 'biblio_display') . '/themes/' . $theme_name .'/' . $theme_name . '.info';
 	return drupal_parse_info_file($filename);
 }
 
