@@ -2,6 +2,12 @@
 
 function biblio_display_admin_settings() {
 	$fields = field_info_instances('node', 'biblio_record');
+    $output = '<table>';
+	$output .= '<tr><td>Field name</td></tr>';
+	foreach ($fields as $field) {
+		$output .= '<tr><td>' . $field['label'] . '</td></tr>';
+	}
+	$output .= '</table>';
 	$themes_list = biblio_display_themes_list();
 	$form = array();
 	if ( !count($themes_list) ) {
@@ -20,7 +26,7 @@ function biblio_display_admin_settings() {
 				'wrapper' => 'wrapper-themesettings',
 				'callback' => 'ajax_biblio_display_settings_callback',
 				'method' => 'replace',
-#				'effect' => 'fade',
+				'effect' => 'fade',
 				'event' => 'change',
 			),
     	);
@@ -28,7 +34,7 @@ function biblio_display_admin_settings() {
 			'#prefix' => '<div id="wrapper-themesettings">',
     		'#suffix' => '</div>',
 			'#type' => 'item',
-			'#markup' => 'Before',
+			'#markup' => $output,
 		);
 	}
     return $form;

@@ -1,0 +1,87 @@
+<?php
+
+function biblio_display_schema() {
+    $schema['biblio_display_fields_regions'] = array(
+        'fields' => array(
+            'fieldname' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'description' => 'The machine readable name of the field' ),
+            'themename' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'description' => 'The machine readable name of the theme' ),
+            'region' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'description' => 'the region where the field is displayed in')
+        ),
+        'primary key' => array('fieldname', 'themename'),
+        'description' => 'This tables lists the fields of biblio_record content type and its regions it is displayed in',
+  );
+  return $schema;
+}
+
+function biblio_display_install() {
+    biblio_display_install_theme();
+}
+
+function biblio_display_uninstall() {
+  drupal_uninstall_schema('biblio_display');
+}
+
+function biblio_display_install_theme() {
+    $values = array(
+        array(
+            'fieldname' => 'biblio_record_author',
+            'themename' => 'simple',
+            'region' => 'header',
+        ),
+        array(
+            'fieldname' => 'biblio_record_isbn',
+            'themename' => 'simple',
+            'region' => 'left',
+        ),
+        array(
+            'fieldname' => 'biblio_record_language',
+            'themename' => 'simple',
+            'region' => 'left',
+        ),
+        array(
+            'fieldname' => 'biblio_record_format',
+            'themename' => 'simple',
+            'region' => 'left',
+        ),
+        array(
+            'fieldname' => 'biblio_record_pub',
+            'themename' => 'simple',
+            'region' => 'left',
+        ),
+        array(
+            'fieldname' => 'biblio_record_year_pub',
+            'themename' => 'simple',
+            'region' => 'left',
+        ),
+        array(
+            'fieldname' => 'biblio_record_series',
+            'themename' => 'simple',
+            'region' => 'left',
+        ),
+        array(
+            'fieldname' => 'biblio_record_edition',
+            'themename' => 'simple',
+            'region' => 'left',
+        ),
+        array(
+            'fieldname' => 'biblio_record_add_details',
+            'themename' => 'simple',
+            'region' => 'right',
+        ),
+        array(
+            'fieldname' => 'biblio_record_description',
+            'themename' => 'simple',
+            'region' => 'right',
+        ),
+        array(
+            'fieldname' => 'biblio_record_subjects',
+            'themename' => 'simple',
+            'region' => 'left',
+        ),
+    );
+    $query = db_insert('biblio_display_fields_regions')->fields(array('fieldname', 'themename', 'region'));
+    foreach ($values as $record) {
+        $query->values($record);
+    }
+    $query->execute();
+}
