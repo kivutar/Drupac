@@ -9,7 +9,7 @@ function biblio_display_menu() {
         'title' => 'Drupac displaying settings',
         'description' =>  'Set up displaying of druapc record',
         'page callback' => 'drupal_get_form',
-        'page arguments' => array('biblio_display_admin_settings'),
+        'page arguments' => array('biblio_display_admin_settings_form'),
         'file' => 'biblio_display.admin.inc',
         'access arguments' => array('administer site configuration'),
 		'type' => MENU_NORMAL_ITEM,

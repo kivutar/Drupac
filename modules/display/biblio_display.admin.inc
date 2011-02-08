@@ -1,6 +1,6 @@
 <?php
 
-function biblio_display_admin_settings() {
+function biblio_display_admin_settings_form($form, &$form_state) {
 	$fields = field_info_instances('node', 'biblio_record');
     $output = '<table>';
 	$output .= '<tr><td>Field name</td></tr>';
@@ -19,7 +19,7 @@ function biblio_display_admin_settings() {
     	$form['bd_current_theme'] = array(
         	'#type' => 'radios',
         	'#title' => t('Sub theme'),
-      	  	'#default_value' => variable_get('bd_current_theme', 'simple'),
+      	  	'#default_value' => variable_get('bd_current_theme', ''),
 			'#options' => $themes_list,
         	'#description' => t('Name of the theme to use.'),
 			'#ajax' => array(
@@ -36,8 +36,17 @@ function biblio_display_admin_settings() {
 			'#type' => 'item',
 			'#markup' => $output,
 		);
+		$form['submit'] = array(
+    		'#type' => 'submit',
+    		'#value' => t('Submit'),
+  		);
 	}
     return $form;
+}
+
+function biblio_display_admin_settings_form_submit($form, &$form_state) {
+	$themename = $form_state['values']['bd_current_theme'];
+	variable_set('bd_current_theme', $themename);
 }
 
 function ajax_biblio_display_settings_callback($form, $form_state) {
@@ -56,12 +65,6 @@ function ajax_biblio_display_settings_callback($form, $form_state) {
 			'#markup' => $output,
 		);
 	return $form['wrapper_themesettings'];
-}
-
-function biblio_display_theme_settings() {
-	$content = '<div>Coucou</div>';
-	print drupal_to_js(array('data' => $content, 'status' => true));
-	exit();
 }
 
 function biblio_display_themes_list() {
