@@ -1,7 +1,4 @@
 <?php
-#$themedata = biblio_display_get_theme_config();
-#$theme_name = $themedata['name'];
-#module_load_include('inc', 'biblio_display', 'themes/' . $theme_name . '/theme');
 
 function biblio_display_menu() {
     $items = array();
@@ -46,7 +43,7 @@ function biblio_display_node_view_alter(&$build) {
 function biblio_display_preprocess_bibliorecord(&$variables) {
 	template_preprocess_node($variables);
 	$title = $variables['title'];
-	$themedata = biblio_display_get_theme_config();
+	$themedata = biblio_display_get_theme_file();
 
 	foreach ($themedata['field'] as $fieldname => $region) {
 		if ( isset($variables['content'][$fieldname]) ) {
@@ -96,8 +93,54 @@ function biblio_display_init() {
     drupal_add_css(drupal_get_path('module', 'biblio_display') . '/themes/simple/biblio.css');
 }
 
-function biblio_display_get_theme_config($theme_name = 'simple') {
+function biblio_display_get_theme_file($theme_name = 'simple') {
 	$filename = drupal_get_path('module', 'biblio_display') . '/themes/' . $theme_name .'/' . $theme_name . '.info';
 	return drupal_parse_info_file($filename);
 }
 
+function get_biblio_display_theme_config($theme_name) {
+	$fields = field_info_instances('node', 'biblio_record');
+	$result = db_query("SELECT fieldname, region FROM {biblio_display_fields_regions} WHERE themename='$theme_name'");
+	$fields_region = array();
+	while ($record = $result->fetchAssoc()) {
+		$fields_region[ $record['fieldname'] ] = $record['region'];
+	}
+
+	$config['fields'] = array();
+	foreach ( $fields as $name => $values) {
+		$config['fields'][ $name ]['label'] = $values['label'];
+		if ( $fields_region[ $name ] ) {
+			$config['fields'][ $name ]['region'] = $fields_region[$name];
+		} else {
+			$config['fields'][ $name ]['region'] = 'none';
+		}
+	}
+	$theme_file = biblio_display_get_theme_file($theme_name);
+	$config['regions'] = $theme_file['regions'];
+	return $config;
+}
+
+function get_biblio_display_availables_themes() {
+	$base_dir = drupal_get_path('module', 'biblio_display') . '/themes';
+	$dir = opendir($base_dir);
+
+	$themes_list = array();
+	$folders = array();
+
+	while($element = readdir($dir)) {
+		if($element != '.' && $element != '..') {
+			if (is_dir($base_dir.'/'.$element)) {
+				$folders[] = $element;
+			}
+		}
+	}
+	closedir($dir);
+	if ( count($folders) ) {
+		foreach ( $folders as $theme ) {
+			$config = array();
+			$config = biblio_display_get_theme_file($theme);
+			$themes_list[ $theme ] = $config['name'];
+		}
+	}
+	return $themes_list;
+}
