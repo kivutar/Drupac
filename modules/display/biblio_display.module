@@ -75,7 +75,7 @@ function biblio_display_get_theme_file($theme_name = 'simple') {
 	return drupal_parse_info_file($filename);
 }
 
-function get_biblio_display_theme_config($theme_name) {
+function biblio_display_get_theme_config($theme_name) {
 	$fields = field_info_instances('node', 'biblio_record');
 	$result = db_query("SELECT fieldname, region FROM {biblio_display_fields_regions} WHERE themename='$theme_name'");
 	$fields_region = array();
