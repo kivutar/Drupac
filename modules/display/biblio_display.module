@@ -11,6 +11,14 @@ function biblio_display_menu() {
         'access arguments' => array('administer site configuration'),
 		'type' => MENU_NORMAL_ITEM,
     );
+	$items['admin/config/drupac/display/%'] = array(
+        'description' =>  'Field configuration',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('biblio_display_admin_theme_fields_form', 4),
+        'file' => 'biblio_display.admin.inc',
+        'access arguments' => array('administer site configuration'),
+		'type' => MENU_CALLBACK,
+    );
 	$items['display/theme'] = array(
 		'title' => 'theme settings',
 		'description' =>  'Set up displaying of druapc record',
@@ -31,6 +39,11 @@ function biblio_display_theme() {
 			'render element' => 'elements',
 			'template' => 'themes/' . $theme . '/node--biblio-record',
 		),
+    	'biblio_display_admin_theme_fields_form' => array(
+      		'template' => 'biblio-display-admin-display-form',
+      		'file' => 'biblio_display.admin.inc',
+      		'render element' => 'form',
+    	),
 	);
 }
 
@@ -59,33 +72,7 @@ function biblio_record_field_attach_view_alter(&$output, $context) {
 }
 
 function theme_authorfield($variables) {
-#Array ( 
-#[elements] => Array ( 
-#	[#theme] => bibliofield 
-#	[#weight] => 1 
-#	[#title] => Author 
-#	[#access] => 1 
-#	[#label_display] => above 
-#	[#view_mode] => full 
-#	[#language] => und 
-#	[#field_name] => biblio_record_author 
-#	[#field_type] => text 
-#	[#field_translatable] => 1 
-#	[#entity_type] => node 
-#	[#bundle] => biblio_record 
-#	[#items] => Array ( 
-#		[0] => Array ( 
-#			[value] => Camilla Lackberg 
-#			[format] => 
-#			[safe_value] => Camilla Lackberg 
-#		) 
-#	) 
-#	[#formatter] => text_default 
-#	[0] => Array ( 
-#		[#markup] => Camilla Lackberg 
-#	) 
   $output = '<h1>By ' . $variables['elements']['#items']['0']['safe_value'] . '</h1>';
-
   return $output;
 }
 
@@ -117,10 +104,12 @@ function get_biblio_display_theme_config($theme_name) {
 	}
 	$theme_file = biblio_display_get_theme_file($theme_name);
 	$config['regions'] = $theme_file['regions'];
+	$config['regions']['none'] = 'None';
 	return $config;
 }
 
 function get_biblio_display_availables_themes() {
+	global $base_url;
 	$base_dir = drupal_get_path('module', 'biblio_display') . '/themes';
 	$dir = opendir($base_dir);
 
@@ -139,7 +128,10 @@ function get_biblio_display_availables_themes() {
 		foreach ( $folders as $theme ) {
 			$config = array();
 			$config = biblio_display_get_theme_file($theme);
-			$themes_list[ $theme ] = $config['name'];
+			$themes_list[ $theme ] = array (
+				'theme_name' => $config['name'],
+				'configure'  => '<a href="' . $base_url . '/admin/config/drupac/display/' . $theme . '">configure</a>'
+			);
 		}
 	}
 	return $themes_list;
