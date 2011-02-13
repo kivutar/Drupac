@@ -4,7 +4,6 @@ function biblio_display_admin_theme_fields_form($form, &$form_state, $theme_name
 
 	drupal_add_css(drupal_get_path('module', 'biblio_display') . '/field.css');
 	$config = get_biblio_display_theme_config($theme_name);
-	$form = array();
 	$form['fields'] = array();
 	foreach ( $config['fields'] as $name => $data ) {
 		$form['fields'][$name]['field_label'] = array(
@@ -47,7 +46,7 @@ function biblio_display_admin_settings_form($form, &$form_state) {
 	$config = get_biblio_display_theme_config($current_theme);
 
     $output = biblio_display_theme_settings_table($config);
-	$themes_list = get_biblio_display_availables_themes();
+	$themes_list = biblio_display_get_availables_themes();
 	$form['bd_current_theme'] = array(
 		'#type' => 'tableselect',
 		'#title' => t('Sub theme'),
@@ -87,9 +86,6 @@ function biblio_display_admin_settings_form($form, &$form_state) {
 function biblio_display_admin_settings_form_submit($form, &$form_state) {
 	$themename = $form_state['values']['bd_current_theme'];
 	variable_set('bd_current_theme', $themename);
-}
-
-function biblio_display_admin_theme_fields_form_submit($form, &$form_state) {
 }
 
 function ajax_biblio_display_settings_callback($form, $form_state) {

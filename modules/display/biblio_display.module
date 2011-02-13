@@ -19,16 +19,6 @@ function biblio_display_menu() {
         'access arguments' => array('administer site configuration'),
 		'type' => MENU_CALLBACK,
     );
-	$items['display/theme'] = array(
-		'title' => 'theme settings',
-		'description' =>  'Set up displaying of druapc record',
-		'page callback' => 'drupal_get_form',
-        'page arguments' => array('biblio_display_theme_settings'),
-        'file' => 'biblio_display.admin.inc',
-        'access arguments' => array('administer site configuration'),
-#    	'type' => MENU_CALLBACK,
-
-	);
     return $items;
 }
 
@@ -108,7 +98,7 @@ function get_biblio_display_theme_config($theme_name) {
 	return $config;
 }
 
-function get_biblio_display_availables_themes() {
+function biblio_display_get_availables_themes() {
 	global $base_url;
 	$base_dir = drupal_get_path('module', 'biblio_display') . '/themes';
 	$dir = opendir($base_dir);
