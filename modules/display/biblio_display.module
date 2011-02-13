@@ -86,7 +86,7 @@ function get_biblio_display_theme_config($theme_name) {
 	$config['fields'] = array();
 	foreach ( $fields as $name => $values) {
 		$config['fields'][ $name ]['label'] = $values['label'];
-		if ( $fields_region[ $name ] ) {
+		if ( isset($fields_region[ $name ]) ) {
 			$config['fields'][ $name ]['region'] = $fields_region[$name];
 		} else {
 			$config['fields'][ $name ]['region'] = 'none';
