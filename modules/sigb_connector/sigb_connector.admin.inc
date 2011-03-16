@@ -1,6 +1,8 @@
 <?php
 
 function sigb_connector_admin_settings() {
+    $fields_config =  sigb_connector_get_fields_config();
+
     $form['sigb_connector'] = array(
         '#type' => 'textfield',
         '#title' => t('SIGB Connector'),
@@ -10,22 +12,18 @@ function sigb_connector_admin_settings() {
 
     $form['sigb_connector_fields_settings'] = array(
         '#type' => 'fieldset',
-        '#title' => t('Fields settings'),
+        '#title' => t('View fields settings'),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
     );
 
-    $fields_of_biblio_record = field_info_instances('node', 'biblio_record');
-    foreach ( $fields_of_biblio_record as $name => $field) {
+    foreach ( $fields_config as $name => $field) {
+	$repetable = $field['repeatable'] ? 'repeatable' : 'no repeatable';
         $form['sigb_connector_fields_settings'][ $name ] = array(
-            '#type' => 'select',
-            '#title' => $field['label'],
-            '#default_value' => 'un',
-            '#options' => array( 'un' => 'Un', 'deux' => 'Deux' ),
-            '#description' => t('Enter the name for this group of settings'),
+            '#type' => 'item',
+            '#markup' => '<div><b>' . $field['label'] . ': </b>' . $field['bindto'] . ' (' . $repetable . ')</div>',
         );
 
     }
     return system_settings_form($form);
 }
-

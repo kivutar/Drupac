@@ -22,7 +22,7 @@ function ilsdi_connector_menu() {
 }
 
 function ilsdi_connector_get_fields() {
-	$config_file = drupal_get_path('module', 'ilsdi_connector') . 'lsdi_connector.conf';
+	$config_file = drupal_get_path('module', 'ilsdi_connector') . '/ilsdi_connector.conf';
 	return drupal_parse_info_file($config_file);
 }
 

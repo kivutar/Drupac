@@ -81,3 +81,10 @@ function sigb_connector_pay_patron_fines($cardnum, $pin = NULL, $payment_details
     return $func($cardnum, $pin, $payment_details);
 }
 
+function sigb_connector_get_fields_config() {
+    $connector = variable_get('sigb_connector', 'ilsdi_connector');
+    $func = $connector.'_get_fields';
+    $connector_config = $func();
+
+    return $connector_config['fields_binding'];
+}
