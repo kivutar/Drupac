@@ -3,6 +3,15 @@
 function biblio_record_install() {
 	$fields = array(
 		array(
+    		'field_name' => 'biblio_record_biblionumber', 
+    		'type' => 'text',
+    		'module' => 'biblio_record', 
+    		'active' => 1,  
+    		'locked' => FALSE, 
+    		'cardinality' => 1, 
+    		'translatable' => TRUE, 
+		),
+		array(
     		'field_name' => 'biblio_record_isbn', 
     		'type' => 'text',
     		'module' => 'biblio_record', 
@@ -10,7 +19,6 @@ function biblio_record_install() {
     		'locked' => FALSE, 
     		'cardinality' => 1, 
     		'translatable' => TRUE, 
-
 		),
 		array(
     		'field_name' => 'biblio_record_author', 
@@ -106,6 +114,21 @@ function biblio_record_install() {
 	);
 
 	$fields_instances = array(
+		array(
+			'field_name' => 'biblio_record_biblionumber',
+    		'entity_type' => 'node',
+    		'label' => t('biblionumber'),
+    		'bundle' => 'biblio_record',
+    		'description' => 'Enter an biblionumber.',
+    		'widget' => array(
+      			'type' => 'text_textfield',
+				'settings' => array('size' => 20),
+    		),
+		'display' => array(
+		    'default' => array('type' => 'hidden'),
+		    'teaser' => array('type' => 'hidden')
+		),
+		),
 		array(
 			'field_name' => 'biblio_record_isbn',
     		'entity_type' => 'node',
@@ -239,7 +262,7 @@ function biblio_record_install() {
 }
 
 function biblio_record_uninstall() {
-	$fields = array('biblio_record_isbn', 'biblio_record_author', 'biblio_record_language', 'biblio_record_format',
+	$fields = array('biblio_record_biblionumber', 'biblio_record_isbn', 'biblio_record_author', 'biblio_record_language', 'biblio_record_format',
 		'biblio_record_pub', 'biblio_record_year_pub', 'biblio_record_series', 'biblio_record_edition',
 		'biblio_record_description', 'biblio_record_add_details', 'biblio_record_subjects');
 	foreach ($fields as $field) {
