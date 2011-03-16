@@ -26,7 +26,9 @@ function harvest_import_record($id) {
 }
 
 function harvest_import_records($offset, $number) {
+    $count = 0;
     for ( $i = $offset; $i < $offset+$number; $i++ ) {
+	echo $count++ %10 ? "$i " : "$i ** $count done.\n";
         harvest_import_record($i);
     }
 }
