@@ -5,7 +5,13 @@ function harvest_import_record($id) {
     
     $node = new stdClass();
     $node->type = 'biblio_record';
+    node_object_prepare($node);
     $node->title = $record['title'];
+    unset( $record['title'] );
+
+    foreach ( $record as $name => $value ) {
+        $node->{$name}['und'][0]['value'] = $value;
+    }
     
     $node = node_submit($node);
     node_save($node);
@@ -17,4 +23,3 @@ function harvest_import_records($offset, $number) {
         harvest_import_record($i);
     }
 }
-

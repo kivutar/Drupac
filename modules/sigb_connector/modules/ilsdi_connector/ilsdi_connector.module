@@ -21,13 +21,14 @@ function ilsdi_connector_menu() {
     return $items;
 }
 
-function ilsdi_connector_get_fields() {
+function ilsdi_connector_get_config() {
 	$config_file = drupal_get_path('module', 'ilsdi_connector') . '/ilsdi_connector.conf';
 	return drupal_parse_info_file($config_file);
 }
 
 function ilsdi_connector_scrape_bib($bnum) {
     $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
+    $ilsdi_config = ilsdi_connector_get_config();
     
     $url = $server.'?service=GetRecords&id=' . $bnum;
     $xml = @simplexml_load_file($url);
@@ -41,10 +42,16 @@ function ilsdi_connector_scrape_bib($bnum) {
     if (!$bib['title']) {
         $bib['title'] = ' ';
     }
-    
-    // Notes
-    $bib['notes'] = '';
-    $bib['notes'] = _prepare_marc_values($bib_info_marc['300'], array('a'));
+
+    foreach ( $ilsdi_config['fields_binding'] as $name => $field ) {
+	list( $field_num, $subfield_num ) = explode("$", $field['bindto']);
+	$bib[ $name ] = ' ';
+	if ( $field['repeatable'] ) {
+	} else {
+	    $value = _prepare_marc_values($bib_info_marc[ $field_num ], array( $subfield_num ));
+	    $bib[ $name ] = $value[0];
+	}
+    }
     
     unset($bib_info_marc);
     return $bib;
