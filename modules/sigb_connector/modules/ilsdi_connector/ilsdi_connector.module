@@ -47,6 +47,8 @@ function ilsdi_connector_scrape_bib($bnum) {
 	list( $field_num, $subfield_num ) = explode("$", $field['bindto']);
 	$bib[ $name ] = ' ';
 	if ( $field['repeatable'] ) {
+	    $value = _prepare_marc_values($bib_info_marc[ $field_num ], array( $subfield_num ));
+	    $bib[ $name ] = $value;
 	} else {
 	    $value = _prepare_marc_values($bib_info_marc[ $field_num ], array( $subfield_num ));
 	    $bib[ $name ] = $value[0];

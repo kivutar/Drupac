@@ -9,8 +9,15 @@ function harvest_import_record($id) {
     $node->title = $record['title'];
     unset( $record['title'] );
 
-    foreach ( $record as $name => $value ) {
-        $node->{$name}['und'][0]['value'] = $value;
+    foreach ( $record as $name => $values ) {
+	if ( is_array( $values ) ) {
+	    foreach ( $values as $value ) {
+	        $node->{$name}['und'][] = array( 'value' => $value );
+	    }
+	}
+	else {
+	    $node->{$name}['und'][0]['value'] = $values;
+	}
     }
     
     $node = node_submit($node);
