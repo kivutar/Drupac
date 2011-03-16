@@ -29,10 +29,11 @@ function ilsdi_connector_get_config() {
 function ilsdi_connector_scrape_bib($bnum) {
     $server = variable_get('ilsdi_server', 'http://opac.koha.localhost/cgi-bin/koha/ilsdi.pl');
     $ilsdi_config = ilsdi_connector_get_config();
-    
+
     $url = $server.'?service=GetRecords&id=' . $bnum;
     $xml = @simplexml_load_file($url);
     $xml2 = @simplexml_load_string($xml->record->marcxml);
+    if ( !$xml2 ) { return; }
     $bib_info_marc = _parse_marc_subfields($xml2);
     
     // Title information

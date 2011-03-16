@@ -2,6 +2,7 @@
 
 function harvest_import_record($id) {
     $record = sigb_connector_scrape_bib($id);
+if ( !$record ) { return; }
     
     $node = new stdClass();
     $node->type = 'biblio_record';
@@ -28,7 +29,10 @@ function harvest_import_record($id) {
 function harvest_import_records($offset, $number) {
     $count = 0;
     for ( $i = $offset; $i < $offset+$number; $i++ ) {
-	echo $count++ %10 ? "$i " : "$i ** $count done.\n";
-        harvest_import_record($i);
+        $nid = harvest_import_record($i);
+	if ( $nid ) { 
+	    $count++;
+	    echo $count %20 ? "$i " : "$i ** $count done.\n"; 
+	}
     }
 }
