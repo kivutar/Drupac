@@ -2,11 +2,20 @@
 
 function harvest_import_record($id) {
     $record = sigb_connector_scrape_bib($id);
-if ( !$record ) { return; }
+    if ( !$record ) { return; }
+
+    // Biblio already exists ?
+    $existing_nid = harvest_record_exists($id);
+    $node = '';
+
+    if ( $existing_nid ) {
+	$node = node_load($existing_nid);
+    } else {
+	$node = new stdClass();
+	$node->type = 'biblio_record';
+	node_object_prepare($node);
+    }
     
-    $node = new stdClass();
-    $node->type = 'biblio_record';
-    node_object_prepare($node);
     $node->title = $record['title'];
     unset( $record['title'] );
 
@@ -35,4 +44,11 @@ function harvest_import_records($offset, $number) {
 	    echo $count %20 ? "$i " : "$i ** $count done.\n"; 
 	}
     }
+}
+
+function harvest_record_exists($id) {
+    $result = db_query("SELECT entity_id FROM {field_revision_biblio_record_biblionumber} WHERE bundle = 'biblio_record' AND biblio_record_biblionumber_value = $id");
+    $record = $result->fetchAssoc();
+
+    return $record['entity_id'];
 }
