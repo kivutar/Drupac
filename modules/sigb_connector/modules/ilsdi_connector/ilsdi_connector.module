@@ -44,9 +44,16 @@ function ilsdi_connector_scrape_bib($bnum) {
         $bib['title'] = ' ';
     }
 
+    // biblionumber information
+    $bib['biblio_record_biblionumber'] = $xml->record->biblioitemnumber;
+
     foreach ( $ilsdi_config['fields_binding'] as $name => $field ) {
 	list( $field_num, $subfield_num ) = explode("$", $field['bindto']);
 	$bib[ $name ] = ' ';
+	#if ( !$subfield_num ) {
+	#    $bib[ $name ] = $bib_info_marc[ $field_num ];
+	#    continue;
+	#}
 	if ( $field['repeatable'] ) {
 	    $value = _prepare_marc_values($bib_info_marc[ $field_num ], array( $subfield_num ));
 	    $bib[ $name ] = $value;
