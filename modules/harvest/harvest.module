@@ -10,7 +10,6 @@ function harvest_import_record($id) {
 
     if ( $existing_nid ) {
 	$node = node_load($existing_nid);
-print_r( $node );
     } else {
 	$node = new stdClass();
 	$node->type = 'biblio_record';

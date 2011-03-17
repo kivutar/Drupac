@@ -49,17 +49,16 @@ function ilsdi_connector_scrape_bib($bnum) {
 
     foreach ( $ilsdi_config['fields_binding'] as $name => $field ) {
 	list( $field_num, $subfield_num ) = explode("$", $field['bindto']);
-	$bib[ $name ] = ' ';
-	#if ( !$subfield_num ) {
-	#    $bib[ $name ] = $bib_info_marc[ $field_num ];
-	#    continue;
-	#}
 	if ( $field['repeatable'] ) {
 	    $value = _prepare_marc_values($bib_info_marc[ $field_num ], array( $subfield_num ));
-	    $bib[ $name ] = $value;
+	    if ( count($value) ) {
+		$bib[ $name ] = $value;
+	    }
 	} else {
 	    $value = _prepare_marc_values($bib_info_marc[ $field_num ], array( $subfield_num ));
-	    $bib[ $name ] = $value[0];
+	    if ( $value[0] ) {
+		$bib[ $name ] = $value[0];
+	    }
 	}
     }
     
