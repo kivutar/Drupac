@@ -1,0 +1,12 @@
+; $Id: cover.info,v 1.0 $
+name = Cover
+description = A cover field for biblio record node type 
+package = Drupac
+core = 7.x
+php = 5.2
+
+files[] = cover.module
+
+dependencies[] = field
+dependencies[] = number
+dependencies[] = text

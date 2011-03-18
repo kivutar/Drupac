@@ -1,0 +1,98 @@
+<?php
+
+function cover_node_load($nodes, $types) {
+    foreach ( $nodes as $node ) {
+	if ( in_array('biblio_record', $types ) ) {
+	    $isbn = $node->biblio_record_isbn['und'][0]['value'];
+	    $node->biblio_record_cover = array(
+		'und' => array(
+		    0 => array(
+			'value' => $isbn,
+		    ),
+		),
+	    );
+	}
+    }
+}
+
+function cover_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+	$element = array();
+	$item = $entity->biblio_record_cover['und'][0]['value'];
+
+	if ( $field['field_name'] == 'biblio_record_cover' ) {
+	    $element[0]['#markup'] = theme( 'cover_formatter_' . $display['type'], array( 'item' => $item ) );
+	}
+	return $element;
+}
+
+function cover_field_widget_info() {
+    return array(
+	'small_cover' => array(
+	    'label' => t('Small Cover'), 
+	    'field types' => array('text'), 
+	    'settings' => array('size' => 60), 
+	    'behaviors' => array(
+		'multiple values' => FIELD_BEHAVIOR_DEFAULT, 
+		'default value' => FIELD_BEHAVIOR_DEFAULT,
+	    ),
+	), 
+	'medium_cover' => array(
+	    'label' => t('Medium Cover'), 
+	    'field types' => array('text'), 
+	    'settings' => array('size' => 60), 
+	    'behaviors' => array(
+		'multiple values' => FIELD_BEHAVIOR_DEFAULT, 
+		'default value' => FIELD_BEHAVIOR_DEFAULT,
+	    ),
+	), 
+    );
+}
+
+function cover_theme() {
+    return array(
+	'cover_formatter_smallcover' => array(
+	    'arguments' => array('element' => NULL),
+	),
+	'cover_formatter_mediumcover' => array(
+	    'arguments' => array('element' => NULL),
+	),
+    );
+}
+
+function cover_field_formatter_info() {
+    return array(
+	'smallcover' => array(
+	    'label' => t('Small Cover'),
+	    'field types' => array('text'),
+	),
+	'mediumcover' => array(
+	    'label' => t('Medium Cover'),
+	    'field types' => array('text'),
+	),
+    );
+}
+
+function theme_cover_formatter_smallcover($element) {
+    $isbn = $element['item'];
+    $isbn = preg_replace('#\s|-#','',$isbn);
+    $url = "http://images.amazon.com/images/P/".$isbn.".01.TZZZZZZZ.jpg";
+    $size = getimagesize($url);
+    if( ! $isbn or $size[0] == 1 ) {
+	$url = '/' . drupal_get_path('module', 'cover') . '/images/nocover.png';
+    }
+    return '<img src="'.$url.'" class="drupac-cover drupac-small-cover" />';
+}
+
+function theme_cover_formatter_mediumcover($element) {
+    $isbn = $element['item'];
+    $isbn = preg_replace('#\s|-#','',$isbn);
+    $url = "http://images.amazon.com/images/P/".$isbn.".01.jpg";
+    $size = getimagesize($url);
+    if( ! $isbn or $size[0] == 1 ) {
+	    $url = '/' . drupal_get_path('module', 'cover') . '/images/nocover.png';
+    }
+    return '<img src="'.$url.'" class="drupac-cover drupac-medium-cover" />';
+}
+
+?>
+

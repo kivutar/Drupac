@@ -1,0 +1,43 @@
+<?php
+
+function cover_install() {
+    $field = array(
+	'field_name' => 'biblio_record_cover',
+	'type' => 'text',
+	'module' => 'cover',
+	'active' => 1,
+	'locked' => FALSE,
+	'cardinality' => 1,
+	'translatable' => FALSE,
+    );
+    field_create_field( $field );
+
+    $instance = array(  
+	'field_name' => 'biblio_record_cover',
+	'entity_type' => 'node',
+	'label' => t('Cover'),
+	'bundle' => 'biblio_record',
+	'widget' => array(
+	    'type' => 'text_textfield',
+	    'settings' => array('size' => 60),
+	),
+	'display' => array(
+	    'default' => array(
+		'label' => 'hidden',
+		'type' => 'mediumcover',
+		'module' => 'cover'
+	    ),
+	    'teaser' => array(
+		'label' => 'hidden',
+		'type' => 'smallcover',
+		'module' => 'cover'
+	    ),
+	),
+    );
+    field_create_instance( $instance );
+}
+
+function cover_uninstall() {
+    field_delete_instance(biblio_record_cover);
+    field_delete_field(biblio_record_cover);
+}
