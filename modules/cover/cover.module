@@ -3,21 +3,21 @@
 function cover_node_load($nodes, $types) {
     foreach ( $nodes as $node ) {
 	if ( in_array('biblio_record', $types ) ) {
-	    $isbn = $node->biblio_record_isbn['und'][0]['value'];
-	    $node->biblio_record_cover = array(
-		'und' => array(
-		    0 => array(
-			'value' => $isbn,
-		    ),
-		),
-	    );
+	    $isbn = '';
+	    if ( $node->biblio_record_isbn ) {
+		$isbn = $node->biblio_record_isbn['und'][0]['value'];
+	    }
+	    $node->biblio_record_cover['und'][0]['value'] = $isbn;
 	}
     }
 }
 
 function cover_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
 	$element = array();
-	$item = $entity->biblio_record_cover['und'][0]['value'];
+	$item = '';
+	if ( $entity->biblio_record_cover ) {
+	    $item = $entity->biblio_record_cover['und'][0]['value'];
+	}
 
 	if ( $field['field_name'] == 'biblio_record_cover' ) {
 	    $element[0]['#markup'] = theme( 'cover_formatter_' . $display['type'], array( 'item' => $item ) );
