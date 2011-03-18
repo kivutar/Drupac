@@ -1,15 +1,6 @@
 <?php
 
 function ilsdi_connector_menu() {
-    $items = array();
-    $items['ilsdi_connector/settings'] = array(
-        'title' => 'ILSDI connector settings',
-        'description' =>  'ILSDI connector settings',
-        'page callback' => 'drupal_get_form',
-        'page arguments' => array('ilsdi_connector_admin_settings'),
-        'file' => 'ilsdi_connector.admin.inc',
-        'access arguments' => array('administer site configuration'),
-    );
     $items['admin/config/drupac/ilsdi_connector'] = array(
         'title' => 'ILSDI connector settings',
         'description' =>  'ILSDI connector settings',

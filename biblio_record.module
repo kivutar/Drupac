@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * Implements hook_menu().
+ */
+function biblio_record_menu() {
+    $items['admin/config/drupac'] = array(
+	'title' => 'Drupac',
+	'description' => 'Configure Drupac.',
+	'position' => 'left',
+	'weight' => -25,
+	'page callback' => 'system_admin_menu_block_page',
+	'access arguments' => array('access administration pages'),
+	'file' => 'system.admin.inc',
+	'file path' => drupal_get_path('module', 'system'),
+    );
+    return $items;
+}
+
 function biblio_record_node_info() {
 	return array(
 		'biblio_record' => array(
