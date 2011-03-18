@@ -45,6 +45,15 @@ function cover_field_widget_info() {
 		'default value' => FIELD_BEHAVIOR_DEFAULT,
 	    ),
 	), 
+	'big_cover' => array(
+	    'label' => t('Big Cover'), 
+	    'field types' => array('text'), 
+	    'settings' => array('size' => 60), 
+	    'behaviors' => array(
+		'multiple values' => FIELD_BEHAVIOR_DEFAULT, 
+		'default value' => FIELD_BEHAVIOR_DEFAULT,
+	    ),
+	), 
     );
 }
 
@@ -54,6 +63,9 @@ function cover_theme() {
 	    'arguments' => array('element' => NULL),
 	),
 	'cover_formatter_mediumcover' => array(
+	    'arguments' => array('element' => NULL),
+	),
+	'cover_formatter_bigcover' => array(
 	    'arguments' => array('element' => NULL),
 	),
     );
@@ -66,6 +78,10 @@ function cover_field_formatter_info() {
 	    'field types' => array('text'),
 	),
 	'mediumcover' => array(
+	    'label' => t('Medium Cover'),
+	    'field types' => array('text'),
+	),
+	'bigcover' => array(
 	    'label' => t('Medium Cover'),
 	    'field types' => array('text'),
 	),
@@ -87,6 +103,17 @@ function theme_cover_formatter_mediumcover($element) {
     $isbn = $element['item'];
     $isbn = preg_replace('#\s|-#','',$isbn);
     $url = "http://images.amazon.com/images/P/".$isbn.".01.jpg";
+    $size = getimagesize($url);
+    if( ! $isbn or $size[0] == 1 ) {
+	    $url = '/' . drupal_get_path('module', 'cover') . '/images/nocover.png';
+    }
+    return '<img src="'.$url.'" class="drupac-cover drupac-medium-cover" />';
+}
+
+function theme_cover_formatter_bigcover($element) {
+    $isbn = $element['item'];
+    $isbn = preg_replace('#\s|-#','',$isbn);
+    $url = "http://images.amazon.com/images/P/".$isbn.".jpg";
     $size = getimagesize($url);
     if( ! $isbn or $size[0] == 1 ) {
 	    $url = '/' . drupal_get_path('module', 'cover') . '/images/nocover.png';
