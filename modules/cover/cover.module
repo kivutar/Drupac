@@ -2,7 +2,7 @@
 
 function cover_node_load($nodes, $types) {
     foreach ( $nodes as $node ) {
-	if ( in_array('biblio_record', $types ) ) {
+	if ( $node->type == 'biblio_record' ) {
 	    $isbn = '';
 	    if ( $node->biblio_record_isbn ) {
 		$isbn = $node->biblio_record_isbn['und'][0]['value'];
