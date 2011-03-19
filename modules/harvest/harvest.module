@@ -14,6 +14,8 @@ function harvest_import_record($id) {
 	$node = new stdClass();
 	$node->type = 'biblio_record';
 	node_object_prepare($node);
+	$node->uid = 1;
+	$node->comment = 0;
     }
     
     $node->title = $record['title'];
