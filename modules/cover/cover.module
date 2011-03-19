@@ -82,7 +82,7 @@ function cover_field_formatter_info() {
 	    'field types' => array('text'),
 	),
 	'bigcover' => array(
-	    'label' => t('Medium Cover'),
+	    'label' => t('Big Cover'),
 	    'field types' => array('text'),
 	),
     );
