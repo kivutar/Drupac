@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * Implement hook_theme()
+ */
+function item_theme() {
+    return array(
+        'biblio_items' => array(
+            'variables' => array('elements' => NULL ),
+        ),
+    );
+}
+
+function item_preprocess_node(&$variables) { 
+	$node = $variables['elements']['#node'];
+	$biblionumber = $node->biblio_record_biblionumber['und'][0]['value'];
+
+	$items = sigb_connector_item_status( $biblionumber );
+	#print_r($items);
+	if ( $node->type == 'biblio_record' && $variables['view_mode'] == 'full' ) {
+	    $variables['content']['items'] = theme( 'biblio_items', array( 'elements' => $items ) );
+	}
+}
+
+function theme_biblio_items($elements) {
+    $output = '<h2>Items:</h2><table>';
+    $output .= '<tr><th>Call Number</th><th>Branch</th><th>Location</th><th>Status</th></tr>';
+    foreach ( $elements['elements']['items'] as $itemnumber => $item ) {
+	$avail = $item['avail'] == 1 ? 'Available' : 'Unavailable';
+	$output .= '<tr><td>' . $item['callnum'] . '</td><td>' . $item['branch'] . '</td><td>' . $item['location'] . '</td><td>' . $avail . '</td></tr>';
+    }
+    $output .= '</table>';
+    return $output;
+}

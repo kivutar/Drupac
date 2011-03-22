@@ -1,0 +1,11 @@
+; $Id: tem.info,v 1.0 $
+name = Item
+description = Retrieve information about biblio items.
+package = Drupac
+core = 7.x
+
+files[] = item.module
+
+dependencies[] = biblio_record
+dependencies[] = harvest
+
