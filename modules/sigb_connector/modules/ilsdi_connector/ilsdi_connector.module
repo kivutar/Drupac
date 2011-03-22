@@ -77,7 +77,11 @@ function ilsdi_connector_item_status($bnum) {
             $is['items'][$itemnumber]['location'] = (string) $item->location;
             $is['items'][$itemnumber]['branch'] = (string) $item->holdingbranch;
             $is['items'][$itemnumber]['age'] = (string) $item->ccode;
-            $is['items'][$itemnumber]['avail']++;
+	    if ( isset( $is['items'][$itemnumber]['avail'] ) ) {
+		$is['items'][$itemnumber]['avail']++;
+	    } else {
+		$is['items'][$itemnumber]['avail'] = 1;
+	    }
             foreach($xml->record->issues->issue as $issue) {
                 if ((int) $item->itemnumber == (int) $issue->itemnumber) {
                     $is['items'][$itemnumber]['avail']--;

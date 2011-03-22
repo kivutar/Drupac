@@ -13,11 +13,10 @@ function item_theme() {
 
 function item_preprocess_node(&$variables) { 
 	$node = $variables['elements']['#node'];
-	$biblionumber = $node->biblio_record_biblionumber['und'][0]['value'];
 
-	$items = sigb_connector_item_status( $biblionumber );
-	#print_r($items);
 	if ( $node->type == 'biblio_record' && $variables['view_mode'] == 'full' ) {
+	    $biblionumber = $node->biblio_record_biblionumber['und'][0]['value'];
+	    $items = sigb_connector_item_status( $biblionumber );
 	    $variables['content']['items'] = theme( 'biblio_items', array( 'elements' => $items ) );
 	}
 }
