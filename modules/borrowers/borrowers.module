@@ -1,0 +1,46 @@
+<?php
+
+function borrowers_theme() {
+    return array(
+	'user_drupac' => array(
+	    'render element' => 'elements',
+	    #'variables' => array('$element' => NULL),
+	),
+    );
+}
+
+function borrowers_user_view_alter(&$build) {
+    #print_r($build);
+    $build['#theme'] = 'user_drupac'; 
+}
+
+function theme_user_drupac($elements) {
+    global $user;
+
+    $patron_info = borrowers_get_patron_info( $user->uid );
+
+    $account = $elements['elements']['#account'];
+    $name = $account->name;
+    return "<h1>$name-coucou</h1>";
+}
+
+function borrowers_get_patron_info($uid) {
+    //get patron cardnumber
+    $result = db_query("SELECT entity_id FROM {field_data_field_cardnumber} WHERE bundle = 'main' AND field_cardnumber_value = $uid");
+    $record = $result->fetchAssoc();
+
+    $patron_info = sigb_connector_patron_info( $record['entity_id'] );
+    $patron_info['cardnum'] = $record['entity_id'];
+    return $patron_info;
+}
+
+# > desc sopac_card_verify;
+# +----------+--------------+------+-----+---------+-------+
+# | Field    | Type         | Null | Key | Default | Extra |
+# +----------+--------------+------+-----+---------+-------+
+# | uid      | mediumint(9) | NO   | MUL | NULL    |       |
+# | cardnum  | varchar(24)  | NO   | MUL | NULL    |       |
+# | verified | tinyint(4)   | NO   | MUL | 0       |       |
+# | vdate    | datetime     | NO   |     | NULL    |       |
+# +----------+--------------+------+-----+---------+-------+
+

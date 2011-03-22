@@ -1,0 +1,8 @@
+; $Id: borrowers.info,v 1.0 $
+name = Borrowers
+description = Allow Drupac users to interract with a SIGB account.
+package = Drupac 
+core = 7.x
+php = 5.2
+
+files[] = borrowers.module

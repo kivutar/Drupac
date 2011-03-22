@@ -1,0 +1,94 @@
+<?php
+
+function borrowers_install() {
+
+    // Install the Drupac tables
+    drupal_install_schema('borrowers');
+
+    $field = array(
+        'field_name' => 'field_cardnumber',
+        'type' => 'text',
+        'module' => 'borrowers',
+        'active' => 1,
+        'locked' => FALSE,
+        'cardinality' => 1,
+        'translatable' => FALSE,
+    );
+    field_create_field( $field );
+
+    $instance = array(
+        'field_name' => 'field_cardnumber',
+        'entity_type' => 'profile2',
+        'label' => t('Library cardnumber'),
+        'bundle' => 'main',
+        'widget' => array(
+            'type' => 'text_textfield',
+            'settings' => array('size' => 60),
+        ),
+        'display' => array(
+            'default' => array(
+                'label' => 'above',
+                'type' => 'text_default',
+                'module' => 'borrowers'
+            ),
+            'teaser' => array(
+                'label' => 'above',
+                'type' => 'text_default',
+                'module' => 'borrowers'
+            ),
+        ), 
+    );
+    field_create_instance( $instance );
+}     
+
+function borrowers_uninstall() { 
+
+    // Remove the Drupal tables
+    drupal_uninstall_schema('borrowers');
+
+    field_delete_instance(field_cardnumber);
+    field_delete_field(field_cardnumber);
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+
+function borrowers_schema() {
+
+  $schema['borrowers_card_verify'] = array(
+    'description' => t('Stores profile field information.'),
+    'fields' => array(
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'size' => 'medium',
+        'description' => t('Drupal user ID.'),
+      ),
+      'cardnum' => array(
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'length' => 24,
+        'description' => t('Library card number.'),
+      ),
+      'verified' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => t('Verified boolean. 0 = NO, 1 = YES'),
+      ),
+      'vdate' => array(
+        'type' => 'datetime',
+        'not null' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'uid' => array('uid'),
+      'cardnum' => array('cardnum'),
+      'verified' => array('verified'),
+    ),
+  );
+
+  return $schema;
+}
