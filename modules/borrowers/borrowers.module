@@ -1,5 +1,28 @@
 <?php
 
+function borrowers_menu() {
+    $items = array();
+    $items['admin/config/drupac/borrowers'] = array(
+        'title' => 'Borrowers settings',
+        'description' =>  'Set up borrowers management',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('borrowers_admin_settings_form'),
+        'file' => 'borrowers.form.inc',
+        'access arguments' => array('administer site configuration'),
+                'type' => MENU_NORMAL_ITEM,
+    );
+    $items['drupac/patron_card'] = array(
+        'title' => 'Drupac cardnumber checking',
+        'description' =>  'Check if your cardnumber is valid',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('borrowers_patron_card_checking_form'),
+        'file' => 'borrowers.form.inc',
+        'access arguments' => array('access content'),
+	'type' => MENU_NORMAL_ITEM,
+    ); 
+    return $items;
+}
+
 function borrowers_theme() {
     return array(
 	'user_drupac' => array(
@@ -26,12 +49,26 @@ function theme_user_drupac($elements) {
 
 function borrowers_get_patron_info($uid) {
     //get patron cardnumber
-    $result = db_query("SELECT entity_id FROM {field_data_field_cardnumber} WHERE bundle = 'main' AND field_cardnumber_value = $uid");
-    $record = $result->fetchAssoc();
+    $cardnumber = borrowers_get_cardnumber($uid);
 
-    $patron_info = sigb_connector_patron_info( $record['entity_id'] );
-    $patron_info['cardnum'] = $record['entity_id'];
+    $patron_info = sigb_connector_patron_info( $cardnumber );
+    $patron_info['cardnum'] = $cardnumber;
     return $patron_info;
+}
+
+function borrowers_get_cardnumber($uid) {
+    $entity_id = borrowers_get_entity_id($uid);
+
+    //Get cardnumber
+    $result = db_query("SELECT field_cardnumber_value FROM {field_data_field_cardnumber} WHERE bundle = 'main' AND entity_id = $entity_id");
+    $record = $result->fetchAssoc();
+    return $record['field_cardnumber_value'];
+}
+
+function borrowers_get_entity_id($uid) {
+    $result = db_query("SELECT pid FROM {profile} WHERE type = 'main' AND uid = $uid");
+    $entity = $result->fetchAssoc();
+    return $entity['pid'];
 }
 
 # > desc sopac_card_verify;

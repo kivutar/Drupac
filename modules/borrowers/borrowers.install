@@ -40,8 +40,12 @@ function borrowers_install() {
 
 function borrowers_uninstall() { 
 
-    field_delete_field('field_cardnumber');
     field_delete_instance('field_cardnumber');
+    field_delete_field('field_cardnumber');
+
+    variable_del('drupac_email_check');
+    variable_del('drupac_adress_check');
+    variable_del('drupac_phone_check');
 }
 
 /**
