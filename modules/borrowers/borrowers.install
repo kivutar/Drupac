@@ -2,9 +2,6 @@
 
 function borrowers_install() {
 
-    // Install the Drupac tables
-    drupal_install_schema('borrowers');
-
     $field = array(
         'field_name' => 'field_cardnumber',
         'type' => 'text',
@@ -43,11 +40,8 @@ function borrowers_install() {
 
 function borrowers_uninstall() { 
 
-    // Remove the Drupal tables
-    drupal_uninstall_schema('borrowers');
-
-    field_delete_instance(field_cardnumber);
-    field_delete_field(field_cardnumber);
+    field_delete_field('field_cardnumber');
+    field_delete_instance('field_cardnumber');
 }
 
 /**
@@ -79,7 +73,7 @@ function borrowers_schema() {
         'description' => t('Verified boolean. 0 = NO, 1 = YES'),
       ),
       'vdate' => array(
-        'type' => 'datetime',
+        'mysql_type' => 'datetime',
         'not null' => TRUE,
       ),
     ),
