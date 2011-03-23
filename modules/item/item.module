@@ -8,6 +8,10 @@ function item_theme() {
         'biblio_items' => array(
             'variables' => array('elements' => NULL ),
         ),
+        'drupac_items' => array(
+            'variables' => array('elements' => NULL ),
+	    'template' => 'themes/items',
+        ),
     );
 }
 
@@ -17,7 +21,7 @@ function item_preprocess_node(&$variables) {
 	if ( $node->type == 'biblio_record' && $variables['view_mode'] == 'full' ) {
 	    $biblionumber = $node->biblio_record_biblionumber['und'][0]['value'];
 	    $items = sigb_connector_item_status( $biblionumber );
-	    $variables['content']['items'] = theme( 'biblio_items', array( 'elements' => $items ) );
+	    $variables['content']['items'] = theme( 'drupac_items', array( 'elements' => $items ) );
 	}
 }
 
